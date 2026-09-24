@@ -1,188 +1,183 @@
-#include "Authcontroller.h"
+#include "AuthController.h"
 
-#include "../../database/Database.h"
 #include "../../auth/AuthUtils.h"
+#include "../../database/Database.h"
 
-#include <pqxx/pqxx>
+#include <cstdlib>
+#include <stdexcept>
+#include <string>
 
 namespace merchantra {
 
+// ============================================================
+// REGISTER
+// ============================================================
+
 void AuthController::registerUser(
     const drogon::HttpRequestPtr &req,
-    std::function<void(const drogon::HttpResponsePtr &)> &&callback)
-{
-    try {
+    std::function<void(const drogon::HttpResponsePtr &)> &&callback) {
 
+    try {
         auto json = req->getJsonObject();
 
         if (!json) {
-            Json::Value error;
-            error["message"] = "Invalid JSON request";
+            Json::Value response;
+            response["message"] = "Invalid JSON body";
 
             auto resp =
-                drogon::HttpResponse::newHttpJsonResponse(error);
-
-            resp->setStatusCode(
-                drogon::k400BadRequest
-            );
-
+                drogon::HttpResponse::newHttpJsonResponse(response);
+            resp->setStatusCode(drogon::k400BadRequest);
             callback(resp);
             return;
         }
 
-        if (!json->isMember("name") ||
-            !json->isMember("email") ||
-            !json->isMember("password")) {
+        std::string name = (*json)["name"].asString();
+        std::string email = (*json)["email"].asString();
+        std::string password = (*json)["password"].asString();
+        std::string role = (*json)["role"].asString();
 
-            Json::Value error;
-            error["message"] =
-                "name, email and password are required";
+        if (name.empty() ||
+            email.empty() ||
+            password.empty() ||
+            role.empty()) {
+
+            Json::Value response;
+            response["message"] =
+                "Name, email, password and role are required";
 
             auto resp =
-                drogon::HttpResponse::newHttpJsonResponse(error);
-
-            resp->setStatusCode(
-                drogon::k400BadRequest
-            );
-
+                drogon::HttpResponse::newHttpJsonResponse(response);
+            resp->setStatusCode(drogon::k400BadRequest);
             callback(resp);
             return;
         }
 
-        std::string name =
-            (*json)["name"].asString();
-
-        std::string email =
-            (*json)["email"].asString();
-
-        std::string password =
-            (*json)["password"].asString();
-
-        auto conn = Database::getConnection();
-
-        pqxx::work txn(*conn);
-
-        auto existing = txn.exec_params(
-            "SELECT id FROM users WHERE email = $1",
-            email
-        );
-
-        if (!existing.empty()) {
-
-            Json::Value error;
-            error["message"] =
-                "User with this email already exists";
-
-            auto resp =
-                drogon::HttpResponse::newHttpJsonResponse(error);
-
-            resp->setStatusCode(
-                drogon::k409Conflict
-            );
-
-            callback(resp);
-            return;
-        }
-
-        /*
-         * NOTE:
-         * This assumes AuthUtils has a function named hashPassword().
-         * If your AuthUtils uses a different function name,
-         * we will adjust it after seeing AuthUtils.h.
-         */
-
+        // Hash password
         std::string passwordHash =
             AuthUtils::hashPassword(password);
 
+        auto conn = Database::getConnection();
+        pqxx::work txn(*conn);
+
+        // --------------------------------------------------------
+        // Find role ID
+        // --------------------------------------------------------
+
+        auto roleResult = txn.exec_params(
+            "SELECT id FROM roles "
+            "WHERE UPPER(name) = UPPER($1)",
+            role);
+
+        if (roleResult.empty()) {
+
+            Json::Value response;
+            response["message"] = "Invalid role";
+
+            auto resp =
+                drogon::HttpResponse::newHttpJsonResponse(response);
+            resp->setStatusCode(drogon::k400BadRequest);
+
+            txn.abort();
+            callback(resp);
+            return;
+        }
+
+        int roleId =
+            roleResult[0]["id"].as<int>();
+
+        // --------------------------------------------------------
+        // Check if email already exists
+        // --------------------------------------------------------
+
+        auto existingUser = txn.exec_params(
+            "SELECT id FROM users WHERE email = $1",
+            email);
+
+        if (!existingUser.empty()) {
+
+            Json::Value response;
+            response["message"] =
+                "User with this email already exists";
+
+            auto resp =
+                drogon::HttpResponse::newHttpJsonResponse(response);
+            resp->setStatusCode(drogon::k409Conflict);
+
+            txn.abort();
+            callback(resp);
+            return;
+        }
+
+        // --------------------------------------------------------
+        // Insert user
+        // --------------------------------------------------------
+
         auto result = txn.exec_params(
             "INSERT INTO users "
-            "(name, email, password_hash) "
-            "VALUES ($1, $2, $3) "
+            "(name, email, password_hash, role_id) "
+            "VALUES ($1, $2, $3, $4) "
             "RETURNING id",
             name,
             email,
-            passwordHash
-        );
+            passwordHash,
+            roleId);
+
+        int userId =
+            result[0]["id"].as<int>();
 
         txn.commit();
 
         Json::Value response;
-
         response["message"] =
             "User registered successfully";
+        response["user_id"] = userId;
+        response["role_id"] = roleId;
+        response["role"] = role;
 
-        if (!result.empty()) {
-            response["user_id"] =
-                result[0]["id"].as<int>();
-        }
+        auto resp =
+            drogon::HttpResponse::newHttpJsonResponse(response);
+
+        resp->setStatusCode(drogon::k201Created);
+
+        callback(resp);
+
+    } catch (const std::exception &e) {
+
+        Json::Value response;
+        response["message"] =
+            std::string("Registration failed: ") + e.what();
 
         auto resp =
             drogon::HttpResponse::newHttpJsonResponse(response);
 
         resp->setStatusCode(
-            drogon::k201Created
-        );
-
-        callback(resp);
-
-    }
-    catch (const std::exception &e) {
-
-        Json::Value error;
-
-        error["message"] = e.what();
-
-        auto resp =
-            drogon::HttpResponse::newHttpJsonResponse(error);
-
-        resp->setStatusCode(
-            drogon::k500InternalServerError
-        );
+            drogon::k500InternalServerError);
 
         callback(resp);
     }
 }
 
 
+// ============================================================
+// LOGIN
+// ============================================================
+
 void AuthController::login(
     const drogon::HttpRequestPtr &req,
-    std::function<void(const drogon::HttpResponsePtr &)> &&callback)
-{
-    try {
+    std::function<void(const drogon::HttpResponsePtr &)> &&callback) {
 
+    try {
         auto json = req->getJsonObject();
 
         if (!json) {
-
-            Json::Value error;
-            error["message"] =
-                "Invalid JSON request";
+            Json::Value response;
+            response["message"] = "Invalid JSON body";
 
             auto resp =
-                drogon::HttpResponse::newHttpJsonResponse(error);
+                drogon::HttpResponse::newHttpJsonResponse(response);
 
             resp->setStatusCode(
-                drogon::k400BadRequest
-            );
-
-            callback(resp);
-            return;
-        }
-
-        if (!json->isMember("email") ||
-            !json->isMember("password")) {
-
-            Json::Value error;
-
-            error["message"] =
-                "email and password are required";
-
-            auto resp =
-                drogon::HttpResponse::newHttpJsonResponse(error);
-
-            resp->setStatusCode(
-                drogon::k400BadRequest
-            );
+                drogon::k400BadRequest);
 
             callback(resp);
             return;
@@ -194,31 +189,55 @@ void AuthController::login(
         std::string password =
             (*json)["password"].asString();
 
-        auto conn =
-            Database::getConnection();
+        if (email.empty() || password.empty()) {
 
+            Json::Value response;
+            response["message"] =
+                "Email and password are required";
+
+            auto resp =
+                drogon::HttpResponse::newHttpJsonResponse(response);
+
+            resp->setStatusCode(
+                drogon::k400BadRequest);
+
+            callback(resp);
+            return;
+        }
+
+        auto conn = Database::getConnection();
         pqxx::work txn(*conn);
 
+        // --------------------------------------------------------
+        // Find user + role
+        // --------------------------------------------------------
+
         auto result = txn.exec_params(
-            "SELECT id, name, email, password_hash "
-            "FROM users "
-            "WHERE email = $1",
-            email
-        );
+            "SELECT "
+            "u.id, "
+            "u.name, "
+            "u.email, "
+            "u.password_hash, "
+            "u.is_active, "
+            "r.name AS role "
+            "FROM users u "
+            "JOIN roles r ON r.id = u.role_id "
+            "WHERE u.email = $1",
+            email);
+
+        txn.commit();
 
         if (result.empty()) {
 
-            Json::Value error;
-
-            error["message"] =
+            Json::Value response;
+            response["message"] =
                 "Invalid email or password";
 
             auto resp =
-                drogon::HttpResponse::newHttpJsonResponse(error);
+                drogon::HttpResponse::newHttpJsonResponse(response);
 
             resp->setStatusCode(
-                drogon::k401Unauthorized
-            );
+                drogon::k401Unauthorized);
 
             callback(resp);
             return;
@@ -226,183 +245,234 @@ void AuthController::login(
 
         auto row = result[0];
 
-        std::string storedHash =
+        int userId =
+            row["id"].as<int>();
+
+        std::string name =
+            row["name"].as<std::string>();
+
+        std::string userEmail =
+            row["email"].as<std::string>();
+
+        std::string passwordHash =
             row["password_hash"].as<std::string>();
 
-        /*
-         * NOTE:
-         * This assumes AuthUtils has verifyPassword().
-         */
+        bool isActive =
+            row["is_active"].as<bool>();
 
-        bool valid =
-            AuthUtils::verifyPassword(
-                password,
-                storedHash
-            );
+        std::string role =
+            row["role"].as<std::string>();
 
-        if (!valid) {
+        // --------------------------------------------------------
+        // Check active status
+        // --------------------------------------------------------
 
-            Json::Value error;
+        if (!isActive) {
 
-            error["message"] =
-                "Invalid email or password";
+            Json::Value response;
+            response["message"] =
+                "User account is inactive";
 
             auto resp =
-                drogon::HttpResponse::newHttpJsonResponse(error);
+                drogon::HttpResponse::newHttpJsonResponse(response);
 
             resp->setStatusCode(
-                drogon::k401Unauthorized
-            );
+                drogon::k403Forbidden);
 
             callback(resp);
             return;
         }
 
-        txn.commit();
+        // --------------------------------------------------------
+        // Verify password
+        // --------------------------------------------------------
+
+        if (!AuthUtils::verifyPassword(
+                password,
+                passwordHash)) {
+
+            Json::Value response;
+            response["message"] =
+                "Invalid email or password";
+
+            auto resp =
+                drogon::HttpResponse::newHttpJsonResponse(response);
+
+            resp->setStatusCode(
+                drogon::k401Unauthorized);
+
+            callback(resp);
+            return;
+        }
+
+        // --------------------------------------------------------
+        // JWT secret
+        // --------------------------------------------------------
+
+        const char *secretEnv =
+            std::getenv("JWT_SECRET");
+
+        if (!secretEnv ||
+            std::string(secretEnv).empty()) {
+
+            throw std::runtime_error(
+                "JWT_SECRET is not configured");
+        }
+
+        std::string jwtSecret =
+            secretEnv;
+
+        // --------------------------------------------------------
+        // Generate JWT
+        // --------------------------------------------------------
+
+        std::string token =
+            AuthUtils::issueToken(
+                userId,
+                role,
+                jwtSecret,
+                60);
+
+        // --------------------------------------------------------
+        // Response
+        // --------------------------------------------------------
+
+        Json::Value user;
+
+        user["id"] = userId;
+        user["name"] = name;
+        user["email"] = userEmail;
+        user["role"] = role;
 
         Json::Value response;
 
         response["message"] =
             "Login successful";
 
-        response["user"]["id"] =
-            row["id"].as<int>();
+        response["token"] =
+            token;
 
-        response["user"]["name"] =
-            row["name"].as<std::string>();
-
-        response["user"]["email"] =
-            row["email"].as<std::string>();
-
-        /*
-         * JWT generation depends on your existing
-         * AuthUtils implementation.
-         *
-         * For now this endpoint returns the authenticated
-         * user information without inventing a JWT API.
-         */
+        response["user"] =
+            user;
 
         auto resp =
             drogon::HttpResponse::newHttpJsonResponse(response);
 
         callback(resp);
 
-    }
-    catch (const std::exception &e) {
+    } catch (const std::exception &e) {
 
-        Json::Value error;
-
-        error["message"] = e.what();
+        Json::Value response;
+        response["message"] =
+            std::string("Login failed: ") + e.what();
 
         auto resp =
-            drogon::HttpResponse::newHttpJsonResponse(error);
+            drogon::HttpResponse::newHttpJsonResponse(response);
 
         resp->setStatusCode(
-            drogon::k500InternalServerError
-        );
+            drogon::k500InternalServerError);
 
         callback(resp);
     }
 }
 
 
+// ============================================================
+// ME
+// ============================================================
+
 void AuthController::me(
     const drogon::HttpRequestPtr &req,
-    std::function<void(const drogon::HttpResponsePtr &)> &&callback)
-{
+    std::function<void(const drogon::HttpResponsePtr &)> &&callback) {
+
     try {
 
-        /*
-         * AuthFilter is expected to validate the JWT
-         * before this controller is called.
-         *
-         * The exact attribute/key used by your AuthFilter
-         * must match your existing implementation.
-         */
-
-        auto userId = req->getParameter("user_id");
-
-        if (userId.empty()) {
-
-            Json::Value error;
-
-            error["message"] =
-                "User information not available";
-
-            auto resp =
-                drogon::HttpResponse::newHttpJsonResponse(error);
-
-            resp->setStatusCode(
-                drogon::k401Unauthorized
-            );
-
-            callback(resp);
-            return;
-        }
+        // IMPORTANT:
+        // AuthFilter stores user_id in request ATTRIBUTES.
+        // Therefore we must NOT use getParameter().
+        int userId =
+            req->getAttributes()->get<int>("user_id");
 
         auto conn =
             Database::getConnection();
 
         pqxx::work txn(*conn);
 
+        // --------------------------------------------------------
+        // Get current user
+        // --------------------------------------------------------
+
         auto result = txn.exec_params(
-            "SELECT id, name, email "
-            "FROM users "
-            "WHERE id = $1",
-            userId
-        );
+            "SELECT "
+            "u.id, "
+            "u.name, "
+            "u.email, "
+            "r.name AS role "
+            "FROM users u "
+            "JOIN roles r ON r.id = u.role_id "
+            "WHERE u.id = $1 "
+            "AND u.is_active = TRUE",
+            userId);
 
         txn.commit();
 
         if (result.empty()) {
 
-            Json::Value error;
-
-            error["message"] =
-                "User not found";
+            Json::Value response;
+            response["message"] =
+                "User information not available";
 
             auto resp =
-                drogon::HttpResponse::newHttpJsonResponse(error);
+                drogon::HttpResponse::newHttpJsonResponse(response);
 
             resp->setStatusCode(
-                drogon::k404NotFound
-            );
+                drogon::k404NotFound);
 
             callback(resp);
             return;
         }
 
-        auto row = result[0];
+        auto row =
+            result[0];
+
+        Json::Value user;
+
+        user["id"] =
+            row["id"].as<int>();
+
+        user["name"] =
+            row["name"].as<std::string>();
+
+        user["email"] =
+            row["email"].as<std::string>();
+
+        user["role"] =
+            row["role"].as<std::string>();
 
         Json::Value response;
 
-        response["id"] =
-            row["id"].as<int>();
-
-        response["name"] =
-            row["name"].as<std::string>();
-
-        response["email"] =
-            row["email"].as<std::string>();
+        response["user"] =
+            user;
 
         auto resp =
             drogon::HttpResponse::newHttpJsonResponse(response);
 
         callback(resp);
 
-    }
-    catch (const std::exception &e) {
+    } catch (const std::exception &e) {
 
-        Json::Value error;
+        Json::Value response;
 
-        error["message"] = e.what();
+        response["message"] =
+            std::string(
+                "Failed to get user information: ") +
+            e.what();
 
         auto resp =
-            drogon::HttpResponse::newHttpJsonResponse(error);
+            drogon::HttpResponse::newHttpJsonResponse(response);
 
         resp->setStatusCode(
-            drogon::k500InternalServerError
-        );
+            drogon::k500InternalServerError);
 
         callback(resp);
     }

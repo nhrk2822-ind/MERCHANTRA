@@ -11,6 +11,8 @@
 #include "database/Database.h"
 
 #include "controllers/AuthController/AuthController.h"
+#include "controllers/InventoryController/InventoryController.h"
+#include "controllers/OrderController/OrderController.h"
 #include "controllers/ProductController/ProductController.h"
 #include "controllers/StationController/StationController.h"
 #include "iot/MockCamera/MockCamera.h"
@@ -63,6 +65,10 @@ int main() {
         std::make_shared<merchantra::AuthController>());
     drogon::app().registerController(
         std::make_shared<merchantra::ProductController>());
+    drogon::app().registerController(
+        std::make_shared<merchantra::InventoryController>());
+    drogon::app().registerController(
+        std::make_shared<merchantra::OrderController>());
 
     // Frontend calls /api/...; controllers register bare paths (/auth/login).
     // Strip the "/api" prefix so both work.
