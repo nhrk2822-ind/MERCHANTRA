@@ -6,6 +6,14 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+if(MSVC)
+    foreach(flag_var
+        CMAKE_CXX_FLAGS_DEBUG
+        CMAKE_C_FLAGS_DEBUG)
+        string(REPLACE "/ZI" "/Zi" ${flag_var} "${${flag_var}}")
+    endforeach()
+endif()
+
 # ---------------------------------------------------------
 # vcpkg
 # ---------------------------------------------------------
@@ -24,7 +32,6 @@ list(APPEND CMAKE_PREFIX_PATH
     "${VCPKG_ROOT}/installed/x64-windows"
     "${VCPKG_ROOT}/installed/x64-windows/share"
 )
-
 # ---------------------------------------------------------
 # Dependencies
 # ---------------------------------------------------------
@@ -32,6 +39,7 @@ list(APPEND CMAKE_PREFIX_PATH
 find_package(Drogon CONFIG REQUIRED)
 find_package(libpqxx CONFIG REQUIRED)
 find_package(jwt-cpp CONFIG REQUIRED)
+find_package(unofficial-sodium CONFIG REQUIRED)
 
 # ---------------------------------------------------------
 # Source files
@@ -68,4 +76,7 @@ target_link_libraries(merchantra_backend
         Drogon::Drogon
         libpqxx::pqxx
         jwt-cpp::jwt-cpp
+        unofficial-sodium::sodium
 )
+
+target_link_options(merchantra_backend PRIVATE "/FORCE:MULTIPLE")
