@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body, #root {
+    height: 100%;
+  }
+  ::selection {
+    background: theme("colors.signal.amber");
+    color: theme("colors.ink");
+  }
+  :focus-visible {
+    outline: 2px solid theme("colors.signal.amber");
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .id-tag {
+    @apply font-mono text-sm tracking-tight text-text;
+  }
+  .divider {
+    @apply border-line;
+  }
+}

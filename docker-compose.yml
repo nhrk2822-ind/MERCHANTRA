@@ -1,0 +1,60 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: merchantra
+      POSTGRES_USER: merchantra
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Migrations run automatically on first container start, in
+      # filename order (001, 002, 003, ...) — that's why they're numbered.
+      - ./database/migrations:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U merchantra"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SERVER_HOST: 0.0.0.0
+      SERVER_PORT: 8080
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: merchantra
+      DB_USER: merchantra
+      DB_PASSWORD: ${DB_PASSWORD:-changeme}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set — see backend/.env.example}
+      JWT_EXPIRY_MINUTES: 60
+      AI_SERVICE_BASE_URL: ${AI_SERVICE_BASE_URL:-http://ai-service:9000}
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend.Dockerfile
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+
+  # Person 2's Python AI service is NOT defined here — it lives in a
+  # separate repo/compose file per the architecture doc ("two developers,
+  # two laptops"). Point AI_SERVICE_BASE_URL above at wherever it's
+  # actually running (or leave the default if it's not up yet — see
+  # AIClientService's REVIEW-degradation behavior).
+
+volumes:
+  pgdata:

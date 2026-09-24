@@ -1,0 +1,20 @@
+# Keeps the Docker build context small and fast — same spirit as
+# .gitignore, but for what gets sent to the Docker daemon on build.
+
+.git/
+.gitignore
+
+backend/build/
+backend/logs/
+backend/.env
+
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+
+vcpkg/
+vcpkg_installed/
+drogon-install/
+
+docs/
+*.md
