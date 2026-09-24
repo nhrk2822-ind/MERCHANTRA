@@ -5,13 +5,11 @@
 
 #include <drogon/drogon.h>
 
+#include <filesystem>
+
 #include "config/Config.h"
 #include "database/Database.h"
 
-// Controllers register their own routes via ADD_METHOD_TO in their
-// METHOD_LIST — Drogon discovers them automatically as long as they're
-// linked into the binary (see CMakeLists.txt), so no explicit
-// "app().registerController(...)" calls are needed for them.
 #include "controllers/AuthController/AuthController.h"
 #include "controllers/ProductController/ProductController.h"
 #include "controllers/StationController/StationController.h"
@@ -25,7 +23,7 @@ int main() {
     merchantra::Config::set(config);
 
     if (config.jwtSecret.empty()) {
-        LOG_ERROR << "JWT_SECRET is not set. Refusing to start — auth "
+        LOG_ERROR << "JWT_SECRET is not set. Refusing to start - auth "
                      "would be unsigned/insecure.";
         return 1;
     }
@@ -40,17 +38,14 @@ int main() {
     merchantra::AIClientService::init(config.aiServiceBaseUrl);
 
     // Simulated hardware until real ESP32/RPi scanner/camera/printer are
-    // wired in — swap these three lines for real driver classes when
-    // physical hardware is available. Nothing else in the codebase
-    // changes, since StationController only depends on the interfaces.
+    // wired in.
     merchantra::StationController::initHardware(
         std::make_unique<merchantra::StationHardwareController>(
             std::make_unique<merchantra::MockScanner>(),
             std::make_unique<merchantra::MockCamera>(),
             std::make_unique<merchantra::MockPrinter>()));
 
-    // Health check — confirms the server is up before anything else
-    // (frontend, monitoring, or the AI service) tries to talk to it.
+    // Health check
     drogon::app().registerHandler(
         "/health",
         [](const drogon::HttpRequestPtr &,
@@ -62,8 +57,37 @@ int main() {
         },
         {drogon::Get});
 
+    // Explicit controller registration (forces the compiler to instantiate
+    // them so their routes actually exist in the binary).
+    drogon::app().registerController(
+        std::make_shared<merchantra::AuthController>());
+    drogon::app().registerController(
+        std::make_shared<merchantra::ProductController>());
+
+    // Frontend calls /api/...; controllers register bare paths (/auth/login).
+    // Strip the "/api" prefix so both work.
+    drogon::app().registerPreRoutingAdvice(
+        [](const drogon::HttpRequestPtr &req,
+           drogon::AdviceCallback &&,
+           drogon::AdviceChainCallback &&accb) {
+            const std::string &p = req->path();
+            if (p.rfind("/api/", 0) == 0) {
+                req->setPath(p.substr(4));  // "/api/auth/login" -> "/auth/login"
+            }
+            accb();
+        });
+
+    // Print every registered route at startup (for debugging).
+    drogon::app().registerBeginningAdvice([]() {
+        for (auto &h : drogon::app().getHandlersInfo()) {
+            LOG_INFO << "ROUTE " << std::get<0>(h);
+        }
+    });
+
     LOG_INFO << "MERCHANTRA backend starting on "
              << config.serverHost << ":" << config.serverPort;
+
+    std::filesystem::create_directories("logs");
 
     drogon::app()
         .setLogPath("./logs")
