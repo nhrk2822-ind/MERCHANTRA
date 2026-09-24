@@ -231,7 +231,12 @@ def generate_sales(products: pd.DataFrame, days: int, rng: np.random.Generator) 
                     reason_weights = [0.10, 0.20, 0.25, 0.25, 0.15, 0.05]
                 return_reason = rng.choice(RETURN_REASONS, p=reason_weights)
 
-            advertising_spend = round(float(rng.uniform(0, 500)) * (2.0 if festival else 1.0), 2)
+            # Ad spend scales with the day's revenue (a realistic ad-spend-to-
+            # revenue ratio), not a flat rupee amount — otherwise ROI figures
+            # become meaningless for high-price categories (electronics,
+            # furniture) vs low-price ones (groceries, stationery).
+            ad_spend_ratio = float(rng.uniform(0.02, 0.08))  # 2-8% of revenue
+            advertising_spend = round(revenue * ad_spend_ratio * (1.5 if festival else 1.0), 2)
 
             stock = max(0, stock - sales)
             if stock < 20:
