@@ -15,7 +15,7 @@ export function AuthProvider({ children }) {
     }
     api.auth
       .me()
-      .then(setUser)
+      .then(({ user }) => setUser(user))
       .catch(() => localStorage.removeItem("merchantra_token"))
       .finally(() => setLoading(false));
   }, []);

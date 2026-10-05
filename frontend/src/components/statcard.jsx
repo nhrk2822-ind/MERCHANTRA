@@ -1,23 +1,24 @@
 import React from "react";
 
-// A manifest-style stat cell: sits inside a hairline-divided strip,
-// not a floating rounded card with a shadow.
-export default function StatCard({ label, value, sub, tone = "default" }) {
+export default function StatCard({ label, value, sub, tone = "default", icon }) {
   const toneClass =
     {
-      default: "text-text",
-      pass: "text-status-pass",
-      fail: "text-status-fail",
-      review: "text-status-review",
-    }[tone] || "text-text";
+      default: "",
+      pass: "is-pass",
+      fail: "is-fail",
+      review: "is-review",
+    }[tone] || "";
 
   return (
-    <div className="px-5 py-4 first:pl-0 last:pr-0">
-      <div className="text-xs text-text-muted mb-1">{label}</div>
-      <div className={`text-2xl font-semibold font-mono ${toneClass}`}>
-        {value}
+    <div className={`mt-stat-card ${toneClass}`}>
+      <div className="mt-stat-card__top">
+        <div className="mt-stat-card__label">{label}</div>
+        {icon && <span className="mt-stat-card__icon">{icon}</span>}
       </div>
-      {sub && <div className="text-xs text-text-muted mt-1">{sub}</div>}
+
+      <div className="mt-stat-card__value">{value}</div>
+
+      {sub && <div className="mt-stat-card__sub">{sub}</div>}
     </div>
   );
 }

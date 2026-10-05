@@ -3,23 +3,23 @@
 @tailwind utilities;
 
 @layer base {
-  html, body, #root {
+  html,
+  body,
+  #root {
     height: 100%;
   }
-  ::selection {
-    background: theme("colors.signal.amber");
-    color: theme("colors.ink");
-  }
+
   :focus-visible {
-    outline: 2px solid theme("colors.signal.amber");
+    outline: 2px solid #6f8ea6;
     outline-offset: 2px;
   }
 }
 
 @layer components {
   .id-tag {
-    @apply font-mono text-sm tracking-tight text-text;
+    @apply font-mono text-sm tracking-tight;
   }
+
   .divider {
     @apply border-line;
   }

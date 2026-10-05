@@ -13,11 +13,13 @@ export default function Advertising() {
     setError("");
     setCampaigns(null);
     setRoi(null);
+
     try {
       const [c, r] = await Promise.all([
         api.advertising.get(permanentId),
         api.roi.get(permanentId),
       ]);
+
       setCampaigns(c);
       setRoi(r);
     } catch (err) {
@@ -25,70 +27,135 @@ export default function Advertising() {
     }
   }
 
+  const totalBudget =
+    campaigns?.reduce(
+      (sum, campaign) => sum + Number(campaign.budget || 0),
+      0
+    ) || 0;
+
   return (
     <Layout title="Advertising">
-      <form onSubmit={handleLookup} className="flex gap-2 mb-6 max-w-md">
-        <input
-          placeholder="Permanent Product ID (MCH-P-000125)"
-          value={permanentId}
-          onChange={(e) => setPermanentId(e.target.value)}
-          required
-          className="flex-1 bg-panel border border-line rounded-sm px-3 py-2 text-sm font-mono"
-        />
-        <button type="submit" className="bg-signal-amber text-ink px-4 rounded-sm text-sm font-medium">
+      <div className="mt-page-intro">
+        <div>
+          <div className="mt-page-kicker">Marketplace growth</div>
+          <h2 className="mt-page-heading">Advertising</h2>
+          <p className="mt-page-description">
+            Inspect campaign activity and product-level return on ad spend.
+          </p>
+        </div>
+      </div>
+
+      <form onSubmit={handleLookup} className="mt-search-bar">
+        <div className="mt-search-bar__field">
+          <span>Product identity</span>
+          <input
+            placeholder="MCH-P-000125"
+            value={permanentId}
+            onChange={(e) => setPermanentId(e.target.value)}
+            required
+          />
+        </div>
+        <button type="submit" className="mt-primary-btn">
           Look up
         </button>
       </form>
 
-      {error && <div className="text-status-fail text-sm mb-4">{error}</div>}
+      {error && <div className="mt-alert mt-alert--error">{error}</div>}
 
       {campaigns && (
-        <div className="mb-8">
-          <h2 className="text-sm font-medium mb-3">Campaigns</h2>
-          {campaigns.length === 0 ? (
-            <p className="text-text-muted text-sm">No campaigns for this product.</p>
-          ) : (
-            <ul className="space-y-2">
-              {campaigns.map((c) => (
-                <li key={c.campaign_id} className="flex justify-between text-sm border-b border-line py-2">
-                  <span className="font-mono">#{c.campaign_id}</span>
-                  <span className="text-text-muted">{c.status}</span>
-                  <span className="font-mono">₹{c.budget.toLocaleString("en-IN")}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      )}
+        <section className="mt-table-panel">
+          <div className="mt-panel-heading">
+            <div>
+              <h3>Campaigns</h3>
+              <span>
+                Total listed budget: ₹{totalBudget.toLocaleString("en-IN")}
+              </span>
+            </div>
+            <span className="mt-count-pill">
+              {campaigns.length} campaigns
+            </span>
+          </div>
 
-      {roi && (
-        <div>
-          <h2 className="text-sm font-medium mb-3">ROI History</h2>
-          {roi.length === 0 ? (
-            <p className="text-text-muted text-sm">No ROI records for this product.</p>
+          {campaigns.length === 0 ? (
+            <div className="mt-empty-state">
+              <h3>No campaigns for this product</h3>
+              <p>Try another permanent product ID.</p>
+            </div>
           ) : (
-            <table className="w-full text-sm max-w-2xl">
+            <table>
               <thead>
-                <tr className="text-left text-text-muted border-b border-line">
-                  <th className="py-2 font-normal">Period</th>
-                  <th className="py-2 font-normal text-right">Cost</th>
-                  <th className="py-2 font-normal text-right">Revenue</th>
-                  <th className="py-2 font-normal text-right">ROI</th>
+                <tr>
+                  <th>Campaign</th>
+                  <th>Status</th>
+                  <th className="text-right">Budget</th>
                 </tr>
               </thead>
               <tbody>
-                {roi.map((r, idx) => (
-                  <tr key={idx} className="border-b border-line">
-                    <td className="py-2 font-mono">{r.period}</td>
-                    <td className="py-2 text-right font-mono">₹{r.cost.toLocaleString("en-IN")}</td>
-                    <td className="py-2 text-right font-mono">₹{r.revenue.toLocaleString("en-IN")}</td>
-                    <td className="py-2 text-right font-mono text-status-pass">{r.roi}x</td>
+                {campaigns.map((c) => (
+                  <tr key={c.campaign_id}>
+                    <td className="mt-mono">#{c.campaign_id}</td>
+                    <td>
+                      <span className="mt-status-pill mt-status-pill--neutral">
+                        {c.status}
+                      </span>
+                    </td>
+                    <td className="text-right mt-mono">
+                      ₹{Number(c.budget || 0).toLocaleString("en-IN")}
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           )}
-        </div>
+        </section>
+      )}
+
+      {roi && (
+        <section className="mt-table-panel mt-panel-gap">
+          <div className="mt-panel-heading">
+            <div>
+              <h3>ROI history</h3>
+              <span>Historical cost, revenue and ROI returned by the backend.</span>
+            </div>
+            <span className="mt-count-pill">{roi.length} periods</span>
+          </div>
+
+          {roi.length === 0 ? (
+            <div className="mt-empty-state">
+              <h3>No ROI records</h3>
+              <p>No ROI history is available for this product.</p>
+            </div>
+          ) : (
+            <table>
+              <thead>
+                <tr>
+                  <th>Period</th>
+                  <th className="text-right">Cost</th>
+                  <th className="text-right">Revenue</th>
+                  <th className="text-right">ROI</th>
+                </tr>
+              </thead>
+              <tbody>
+                {roi.map((record, idx) => (
+                  <tr key={idx}>
+                    <td className="mt-mono">{record.period}</td>
+                    <td className="text-right mt-mono">
+                      ₹{Number(record.cost || 0).toLocaleString("en-IN")}
+                    </td>
+                    <td className="text-right mt-mono">
+                      ₹{Number(record.revenue || 0).toLocaleString("en-IN")}
+                    </td>
+                    <td className="text-right">
+                      <span className="mt-status-pill mt-status-pill--success">
+                        {record.roi}x
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </section>
       )}
     </Layout>
   );

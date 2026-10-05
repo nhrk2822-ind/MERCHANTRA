@@ -11,7 +11,8 @@ CREATE TABLE returns (
     id             SERIAL PRIMARY KEY,
     order_item_id  INTEGER NOT NULL REFERENCES order_items(id),
     permanent_product_id VARCHAR(20) NOT NULL REFERENCES products(permanent_product_id),
-    reason         TEXT,
+    reaso
+    n         TEXT,
     status         VARCHAR(20) NOT NULL DEFAULT 'REQUESTED' CHECK (
         status IN ('REQUESTED', 'RECEIVED', 'INSPECTED', 'CLOSED')
     ),

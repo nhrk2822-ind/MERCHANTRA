@@ -4,11 +4,17 @@ import TopBar from "./TopBar.jsx";
 
 export default function Layout({ title, children }) {
   return (
-    <div className="h-screen flex bg-ink text-text">
+    <div className="flex h-screen overflow-hidden bg-[#f4f7fa] text-slate-900">
       <Sidebar />
-      <div className="flex-1 flex flex-col min-w-0">
+
+      <div className="flex min-w-0 flex-1 flex-col">
         <TopBar title={title} />
-        <main className="flex-1 overflow-y-auto p-6">{children}</main>
+
+        <main className="min-h-0 flex-1 overflow-y-auto bg-[#f4f7fa]">
+          <div className="mx-auto w-full max-w-[1700px] p-4 sm:p-6 lg:p-8">
+            {children}
+          </div>
+        </main>
       </div>
     </div>
   );

@@ -10,10 +10,16 @@
 #include "config/Config.h"
 #include "database/Database.h"
 
-#include "controllers/AuthController/AuthController.h"
-#include "controllers/InventoryController/InventoryController.h"
-#include "controllers/OrderController/OrderController.h"
-#include "controllers/ProductController/ProductController.h"
+#include "controllers/AdvertisingController/AdvertisingController.h"
+#include "controllers/AuditController/Auditcontroller.h"
+#include "controllers/AuthController/Authcontroller.h"
+#include "controllers/ForecastController/forecastcontroller.h"
+#include "controllers/InventoryController/Inventorycontroller.h"
+#include "controllers/MarketplaceController/Marketplacecontroller.h"
+#include "controllers/OrderController/Ordercontroller.h"
+#include "controllers/ProductController/productcontroller.h"
+#include "controllers/RestockController/restockcontroller.h"
+#include "controllers/ReturnController/Returncontroller.h"
 #include "controllers/StationController/StationController.h"
 #include "iot/MockCamera/MockCamera.h"
 #include "iot/MockPrinter/MockPrinter.h"
@@ -61,24 +67,26 @@ int main() {
 
     // Explicit controller registration (forces the compiler to instantiate
     // them so their routes actually exist in the binary).
-    drogon::app().registerController(
-        std::make_shared<merchantra::AuthController>());
-    drogon::app().registerController(
-        std::make_shared<merchantra::ProductController>());
-    drogon::app().registerController(
-        std::make_shared<merchantra::InventoryController>());
-    drogon::app().registerController(
-        std::make_shared<merchantra::OrderController>());
+    drogon::app().registerController(std::make_shared<merchantra::AuthController>());
+    drogon::app().registerController(std::make_shared<merchantra::ProductController>());
+    drogon::app().registerController(std::make_shared<merchantra::OrderController>());
+    drogon::app().registerController(std::make_shared<merchantra::InventoryController>());
+    drogon::app().registerController(std::make_shared<merchantra::ReturnController>());
+    drogon::app().registerController(std::make_shared<merchantra::MarketplaceController>());
+    drogon::app().registerController(std::make_shared<merchantra::ForecastController>());
+    drogon::app().registerController(std::make_shared<merchantra::AdvertisingController>());
+    drogon::app().registerController(std::make_shared<merchantra::AuditController>());
+    drogon::app().registerController(std::make_shared<merchantra::RestockController>());
+    drogon::app().registerController(std::make_shared<merchantra::StationController>());
 
     // Frontend calls /api/...; controllers register bare paths (/auth/login).
-    // Strip the "/api" prefix so both work.
     drogon::app().registerPreRoutingAdvice(
         [](const drogon::HttpRequestPtr &req,
            drogon::AdviceCallback &&,
            drogon::AdviceChainCallback &&accb) {
             const std::string &p = req->path();
             if (p.rfind("/api/", 0) == 0) {
-                req->setPath(p.substr(4));  // "/api/auth/login" -> "/auth/login"
+                req->setPath(p.substr(4));
             }
             accb();
         });

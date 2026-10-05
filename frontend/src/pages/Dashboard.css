@@ -1,0 +1,1037 @@
+/* =========================================================
+   MERCHANTRA DASHBOARD
+   Screenshot-inspired landing / command dashboard
+   ========================================================= */
+
+.dashboard-home {
+  min-height: calc(100vh - 80px);
+  padding: 22px 28px 36px;
+  background:
+    radial-gradient(
+      circle at 70% 35%,
+      rgba(212, 235, 241, 0.55),
+      transparent 32%
+    ),
+    linear-gradient(135deg, #f7f9fb 0%, #f1f5f7 100%);
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.dashboard-hero {
+  max-width: 1420px;
+  margin: 0 auto;
+  min-height: calc(100vh - 145px);
+
+  display: grid;
+  grid-template-columns: 0.82fr 1.18fr;
+  align-items: center;
+  gap: 40px;
+}
+
+/* =========================================================
+   LEFT CONTENT
+   ========================================================= */
+
+.dashboard-hero-content {
+  padding: 30px 0 30px 16px;
+  position: relative;
+  z-index: 5;
+}
+
+.dashboard-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+
+  padding: 7px 11px;
+
+  border-radius: 20px;
+
+  background: #e8f3f5;
+  color: #397b8b;
+
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.dashboard-eyebrow-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #23879b;
+}
+
+.dashboard-title {
+  margin: 28px 0 0;
+
+  font-size: clamp(42px, 4.3vw, 68px);
+  line-height: 0.98;
+
+  font-weight: 800;
+  letter-spacing: -2.8px;
+
+  color: #102d42;
+}
+
+.dashboard-title span {
+  color: #247f91;
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 600;
+  letter-spacing: -2.5px;
+}
+
+.dashboard-description {
+  max-width: 570px;
+
+  margin: 27px 0 0;
+
+  font-size: 13px;
+  line-height: 1.8;
+
+  color: #647783;
+}
+
+.dashboard-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  margin-top: 30px;
+}
+
+.dashboard-primary-btn,
+.dashboard-secondary-btn {
+  min-height: 42px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+
+  padding: 0 18px;
+
+  border-radius: 10px;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  text-decoration: none;
+
+  transition: 0.2s ease;
+}
+
+.dashboard-primary-btn {
+  color: white;
+  background: #102f43;
+  box-shadow: 0 8px 20px rgba(16, 47, 67, 0.15);
+}
+
+.dashboard-primary-btn:hover {
+  transform: translateY(-2px);
+  background: #0b2638;
+}
+
+.dashboard-primary-btn span {
+  font-size: 15px;
+}
+
+.dashboard-secondary-btn {
+  color: #355366;
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid #cfd9de;
+}
+
+.dashboard-secondary-btn:hover {
+  background: white;
+  border-color: #aebfc7;
+}
+
+.dashboard-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+
+  margin-top: 31px;
+}
+
+.dashboard-features div {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  font-size: 9px;
+  font-weight: 700;
+
+  color: #667983;
+}
+
+.dashboard-features span {
+  font-size: 10px;
+  color: #718d82;
+}
+
+/* =========================================================
+   RIGHT VISUAL
+   ========================================================= */
+
+.dashboard-visual {
+  position: relative;
+
+  min-height: 600px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 30px 0;
+}
+
+/* Main browser mockup */
+
+.dashboard-browser {
+  position: relative;
+
+  width: 78%;
+  min-height: 500px;
+
+  margin-left: 0;
+
+  overflow: visible;
+
+  border: 1px solid #d8e0e4;
+  border-radius: 17px;
+
+  background: white;
+
+  box-shadow:
+    0 25px 60px rgba(25, 54, 70, 0.12),
+    0 5px 18px rgba(25, 54, 70, 0.06);
+
+  z-index: 1;
+}
+
+/* =========================================================
+   BROWSER TOP
+   ========================================================= */
+
+.browser-top {
+  height: 43px;
+
+  display: flex;
+  align-items: center;
+  gap: 15px;
+
+  padding: 0 17px;
+
+  background: #f8fafb;
+
+  border-bottom: 1px solid #e8edef;
+
+  border-radius: 17px 17px 0 0;
+}
+
+.browser-dots {
+  display: flex;
+  gap: 5px;
+}
+
+.browser-dots span {
+  width: 6px;
+  height: 6px;
+
+  border-radius: 50%;
+
+  background: #b9c5ca;
+}
+
+.browser-address {
+  width: 54%;
+  height: 9px;
+
+  border-radius: 20px;
+
+  background: #e7ecef;
+}
+
+/* =========================================================
+   BROWSER BODY
+   ========================================================= */
+
+.browser-body {
+  display: flex;
+
+  min-height: 457px;
+
+  overflow: hidden;
+
+  border-radius: 0 0 17px 17px;
+}
+
+/* =========================================================
+   MINI SIDEBAR
+   ========================================================= */
+
+.mock-sidebar {
+  width: 112px;
+
+  flex-shrink: 0;
+
+  padding: 17px 9px;
+
+  background: #0c2939;
+  color: white;
+}
+
+.mock-logo {
+  margin: 2px 6px 23px;
+
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.mock-nav {
+  height: 30px;
+
+  display: flex;
+  align-items: center;
+
+  padding: 0 8px;
+
+  margin-bottom: 3px;
+
+  border-radius: 6px;
+
+  font-size: 7px;
+
+  color: #aebdc5;
+}
+
+.mock-nav.active {
+  background: #15576b;
+  color: white;
+}
+
+.mock-nav span {
+  margin-right: 5px;
+}
+
+/* =========================================================
+   MOCK MAIN
+   ========================================================= */
+
+.mock-main {
+  flex: 1;
+
+  min-width: 0;
+
+  padding: 22px 19px;
+
+  background: #f6f8f9;
+}
+
+.mock-main-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+
+  margin-bottom: 16px;
+}
+
+.mock-small-label {
+  font-size: 6px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+
+  color: #9aa8ae;
+}
+
+.mock-greeting {
+  margin-top: 6px;
+
+  font-size: 14px;
+  font-weight: 800;
+
+  color: #243f50;
+}
+
+.mock-ai-status {
+  padding: 6px 8px;
+
+  border-radius: 6px;
+
+  background: #edf5e9;
+
+  font-size: 6px;
+  font-weight: 700;
+
+  color: #6c8d67;
+}
+
+.mock-ai-status span {
+  display: inline-block;
+
+  width: 4px;
+  height: 4px;
+
+  margin-right: 4px;
+
+  border-radius: 50%;
+
+  background: #73a269;
+}
+
+/* =========================================================
+   PRODUCT CARD
+   ========================================================= */
+
+.mock-product-card {
+  padding: 16px;
+
+  border-radius: 10px;
+
+  background: #eee6d6;
+  border: 1px solid #e2d8c4;
+}
+
+.mock-product-id {
+  margin-top: 5px;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  color: #294454;
+}
+
+.mock-progress {
+  height: 5px;
+
+  margin-top: 15px;
+
+  overflow: hidden;
+
+  border-radius: 10px;
+
+  background: #d8d9ce;
+}
+
+.mock-progress span {
+  display: block;
+
+  width: 73%;
+  height: 100%;
+
+  border-radius: inherit;
+
+  background: #267d8d;
+}
+
+.mock-lifecycle {
+  display: flex;
+  justify-content: space-between;
+
+  margin-top: 7px;
+
+  font-size: 5px;
+
+  color: #89959a;
+}
+
+/* =========================================================
+   AI CARD
+   ========================================================= */
+
+.mock-ai-card {
+  display: flex;
+  gap: 8px;
+
+  margin-top: 12px;
+  padding: 11px;
+
+  border-radius: 9px;
+
+  background: #e8f1df;
+  border: 1px solid #dce8d1;
+}
+
+.mock-ai-icon {
+  width: 19px;
+  height: 19px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 5px;
+
+  background: white;
+
+  font-size: 9px;
+  color: #789965;
+}
+
+.mock-ai-title {
+  font-size: 7px;
+  font-weight: 800;
+
+  color: #52674a;
+}
+
+.mock-ai-text {
+  margin-top: 3px;
+
+  font-size: 6px;
+
+  color: #84917e;
+}
+
+/* =========================================================
+   STATS
+   ========================================================= */
+
+.mock-stat-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  gap: 9px;
+
+  margin-top: 11px;
+}
+
+.mock-stat-card {
+  padding: 12px;
+
+  border-radius: 8px;
+
+  background: white;
+
+  border: 1px solid #e4eaed;
+}
+
+.mock-stat-card span {
+  display: block;
+
+  font-size: 5px;
+  font-weight: 800;
+
+  letter-spacing: 0.08em;
+
+  color: #a0abb0;
+}
+
+.mock-stat-card strong {
+  display: block;
+
+  margin-top: 6px;
+
+  font-size: 8px;
+
+  color: #334e5d;
+}
+
+/* =========================================================
+   CONNECT CARD
+   ========================================================= */
+
+.mock-connect {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  margin-top: 11px;
+  padding: 11px;
+
+  border-radius: 8px;
+
+  color: white;
+  background: #237e91;
+}
+
+.mock-connect-icon {
+  font-size: 14px;
+}
+
+.mock-connect strong {
+  display: block;
+
+  font-size: 7px;
+}
+
+.mock-connect small {
+  display: block;
+
+  margin-top: 2px;
+
+  font-size: 5px;
+
+  opacity: 0.75;
+}
+
+.mock-connect > span {
+  margin-left: auto;
+
+  font-size: 12px;
+}
+
+/* =========================================================
+   MARKETPLACE PANEL
+   ========================================================= */
+
+.marketplace-panel {
+  position: absolute;
+
+  right: 2%;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  width: 245px;
+
+  padding: 19px;
+
+  border-radius: 13px;
+
+  background: rgba(255, 255, 255, 0.98);
+
+  border: 1px solid #dce4e8;
+
+  box-shadow:
+    0 22px 55px rgba(29, 57, 70, 0.14),
+    0 4px 15px rgba(29, 57, 70, 0.06);
+
+  z-index: 5;
+}
+
+/*
+  Keep the panel visually connected to the browser,
+  but don't allow it to cover the main content.
+*/
+
+.marketplace-heading {
+  font-size: 11px;
+  font-weight: 800;
+
+  color: #294252;
+}
+
+.marketplace-panel > p {
+  margin: 7px 0 12px;
+
+  font-size: 7px;
+  line-height: 1.6;
+
+  color: #87959c;
+}
+
+.marketplace-search {
+  height: 28px;
+
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 0 9px;
+
+  border: 1px solid #e0e6e9;
+  border-radius: 7px;
+
+  font-size: 7px;
+
+  color: #a1adb2;
+
+  background: #fafbfc;
+}
+
+.marketplace-filter {
+  width: 100%;
+  height: 27px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-top: 7px;
+
+  padding: 0 9px;
+
+  border: 1px solid #e0e6e9;
+  border-radius: 7px;
+
+  background: white;
+
+  font-size: 7px;
+
+  color: #6f7f87;
+}
+
+.marketplace-section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-top: 15px;
+  margin-bottom: 8px;
+
+  font-size: 7px;
+}
+
+.marketplace-section-title strong {
+  color: #435965;
+}
+
+.marketplace-section-title span {
+  color: #4a8897;
+}
+
+.marketplace-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+
+  gap: 7px;
+}
+
+.marketplace-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  gap: 4px;
+
+  font-size: 5.5px;
+
+  color: #6d7d84;
+}
+
+.marketplace-icon {
+  width: 27px;
+  height: 27px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 6px;
+
+  font-size: 12px;
+  font-weight: 800;
+
+  background: #f4f6f7;
+  color: #42545d;
+}
+
+.amazon {
+  color: #1f2428;
+  background: #f5f5f2;
+}
+
+.flipkart {
+  color: #2875d3;
+  background: #edf4ff;
+}
+
+.shopify {
+  color: #659d4b;
+  background: #eef7eb;
+}
+
+.meesho {
+  color: #b63279;
+  background: #f9edf4;
+}
+
+.myntra {
+  color: #d65b98;
+  background: #fbedf5;
+}
+
+.bigbasket {
+  color: #343e43;
+  background: #f0f2f3;
+}
+
+.etsy {
+  color: #d76b3c;
+  background: #fff1ea;
+}
+
+.walmart {
+  color: #83a93d;
+  background: #f2f7e9;
+}
+
+/* =========================================================
+   CATEGORIES
+   ========================================================= */
+
+.categories-title {
+  margin-top: 15px;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+
+  gap: 6px;
+}
+
+.category-item {
+  min-height: 49px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #e7ecef;
+  border-radius: 6px;
+
+  background: #fbfcfc;
+
+  text-align: center;
+}
+
+.category-item > div {
+  font-size: 10px;
+
+  color: #718e97;
+}
+
+.category-item span {
+  margin-top: 3px;
+
+  font-size: 5px;
+  font-weight: 700;
+
+  color: #63757d;
+}
+
+.category-item small {
+  margin-top: 2px;
+
+  font-size: 4.5px;
+
+  color: #a3adb1;
+}
+
+/* =========================================================
+   VIEW ALL APPS
+   ========================================================= */
+
+.view-all-apps {
+  width: 100%;
+  height: 29px;
+
+  margin-top: 10px;
+
+  border: 0;
+  border-radius: 6px;
+
+  background: #287f91;
+
+  color: white;
+
+  font-size: 7px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.view-all-apps:hover {
+  background: #1f7182;
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   FLOATING PRODUCT ID
+   ========================================================= */
+
+.permanent-id-badge {
+  position: absolute;
+
+  left: 29%;
+  bottom: 43px;
+
+  z-index: 7;
+
+  min-width: 115px;
+
+  padding: 10px 13px;
+
+  border-radius: 8px;
+
+  background: #102f43;
+
+  box-shadow: 0 12px 25px rgba(16, 47, 67, 0.22);
+
+  color: white;
+}
+
+.permanent-id-badge span {
+  display: block;
+
+  font-size: 5px;
+  font-weight: 700;
+
+  letter-spacing: 0.08em;
+
+  color: #8ea4ae;
+}
+
+.permanent-id-badge strong {
+  display: block;
+
+  margin-top: 4px;
+
+  font-family: "JetBrains Mono", monospace;
+
+  font-size: 8px;
+
+  letter-spacing: 0.04em;
+}
+
+/* =========================================================
+   ERROR
+   ========================================================= */
+
+.dashboard-error {
+  max-width: 1420px;
+
+  margin: 10px auto;
+
+  padding: 12px 15px;
+
+  border: 1px solid #f0cccc;
+  border-radius: 9px;
+
+  background: #fff4f4;
+
+  font-size: 10px;
+
+  color: #bd5555;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1200px) {
+  .dashboard-hero {
+    grid-template-columns: 0.85fr 1.15fr;
+    gap: 20px;
+  }
+
+  .dashboard-title {
+    font-size: 48px;
+  }
+
+  .dashboard-browser {
+    width: 80%;
+  }
+
+  .marketplace-panel {
+    width: 215px;
+    right: 0;
+  }
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 950px) {
+  .dashboard-hero {
+    grid-template-columns: 1fr;
+
+    padding: 20px 0 50px;
+  }
+
+  .dashboard-hero-content {
+    padding-left: 5px;
+  }
+
+  .dashboard-visual {
+    min-height: 560px;
+  }
+
+  .dashboard-browser {
+    width: 82%;
+  }
+
+  .marketplace-panel {
+    right: 2%;
+  }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 650px) {
+  .dashboard-home {
+    padding: 15px;
+  }
+
+  .dashboard-title {
+    font-size: 40px;
+
+    letter-spacing: -1.8px;
+  }
+
+  .dashboard-title span {
+    letter-spacing: -1.5px;
+  }
+
+  .dashboard-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .dashboard-primary-btn,
+  .dashboard-secondary-btn {
+    width: 100%;
+  }
+
+  .dashboard-features {
+    gap: 10px;
+  }
+
+  .dashboard-visual {
+    min-height: 480px;
+  }
+
+  .dashboard-browser {
+    width: 100%;
+    margin: 0;
+  }
+
+  /* On small screens the floating panel becomes part of the flow */
+  .marketplace-panel {
+    position: relative;
+
+    top: auto;
+    right: auto;
+
+    transform: none;
+
+    width: 100%;
+
+    margin-top: 20px;
+  }
+
+  .permanent-id-badge {
+    left: 20px;
+    bottom: 25px;
+  }
+}

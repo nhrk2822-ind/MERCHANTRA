@@ -7,32 +7,85 @@ export default function Settings() {
 
   return (
     <Layout title="Settings">
-      <div className="max-w-md border border-line rounded p-4">
-        <h2 className="text-sm font-medium mb-3">Account</h2>
-        {user ? (
-          <dl className="text-sm space-y-2">
-            <div className="flex justify-between">
-              <dt className="text-text-muted">Name</dt>
-              <dd>{user.name}</dd>
-            </div>
-            <div className="flex justify-between">
-              <dt className="text-text-muted">Email</dt>
-              <dd className="font-mono">{user.email}</dd>
-            </div>
-            <div className="flex justify-between">
-              <dt className="text-text-muted">Role</dt>
-              <dd className="font-mono">{user.role}</dd>
-            </div>
-          </dl>
-        ) : (
-          <p className="text-text-muted text-sm">Not signed in.</p>
-        )}
+      <div className="mt-page-intro">
+        <div>
+          <div className="mt-page-kicker">Workspace configuration</div>
+          <h2 className="mt-page-heading">Settings</h2>
+          <p className="mt-page-description">
+            Account information and the future home for marketplace and station
+            configuration.
+          </p>
+        </div>
       </div>
 
-      <p className="text-xs text-text-muted mt-6">
-        Marketplace connections, station configuration, and notification
-        preferences will live here as those features are built out.
-      </p>
+      <div className="mt-settings-grid">
+        <section className="mt-account-card">
+          <div className="mt-account-card__header">
+            <div>
+              <div className="mt-page-kicker">Current session</div>
+              <h3>Account</h3>
+            </div>
+
+            <div className="mt-account-avatar">
+              {(user?.name || "U").slice(0, 1).toUpperCase()}
+            </div>
+          </div>
+
+          {user ? (
+            <dl className="mt-account-list">
+              <div>
+                <dt>Name</dt>
+                <dd>{user.name}</dd>
+              </div>
+              <div>
+                <dt>Email</dt>
+                <dd className="mt-mono">{user.email}</dd>
+              </div>
+              <div>
+                <dt>Role</dt>
+                <dd>
+                  <span className="mt-status-pill mt-status-pill--info">
+                    {user.role}
+                  </span>
+                </dd>
+              </div>
+            </dl>
+          ) : (
+            <p className="mt-empty-copy">Not signed in.</p>
+          )}
+        </section>
+
+        <section className="mt-settings-card">
+          <div className="mt-panel-heading">
+            <div>
+              <h3>Configuration modules</h3>
+              <span>Planned homes for the next product layers.</span>
+            </div>
+          </div>
+
+          <div className="mt-settings-list">
+            {[
+              ["Marketplace connections", "Sync and connection settings"],
+              ["Smart Station", "Scanner, camera and station preferences"],
+              ["Notifications", "Operational alerts and preferences"],
+              ["Access control", "Roles and workspace permissions"],
+            ].map(([title, description]) => (
+              <div className="mt-settings-row" key={title}>
+                <div>
+                  <div className="mt-strong">{title}</div>
+                  <div className="mt-settings-row__description">
+                    {description}
+                  </div>
+                </div>
+
+                <span className="mt-status-pill mt-status-pill--neutral">
+                  Coming soon
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
     </Layout>
   );
 }

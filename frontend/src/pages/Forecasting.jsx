@@ -11,6 +11,7 @@ export default function Forecasting() {
     e.preventDefault();
     setError("");
     setForecasts(null);
+
     try {
       const data = await api.forecasts.get(permanentId);
       setForecasts(data);
@@ -21,50 +22,96 @@ export default function Forecasting() {
 
   return (
     <Layout title="Forecasting">
-      <form onSubmit={handleLookup} className="flex gap-2 mb-6 max-w-md">
-        <input
-          placeholder="Permanent Product ID (MCH-P-000125)"
-          value={permanentId}
-          onChange={(e) => setPermanentId(e.target.value)}
-          required
-          className="flex-1 bg-panel border border-line rounded-sm px-3 py-2 text-sm font-mono"
-        />
-        <button type="submit" className="bg-signal-amber text-ink px-4 rounded-sm text-sm font-medium">
-          Look up
+      <div className="mt-page-intro">
+        <div>
+          <div className="mt-page-kicker">Demand planning</div>
+          <h2 className="mt-page-heading">Forecasting</h2>
+          <p className="mt-page-description">
+            Retrieve demand projections, stockout risk and restock guidance.
+          </p>
+        </div>
+      </div>
+
+      <form onSubmit={handleLookup} className="mt-search-bar">
+        <div className="mt-search-bar__field">
+          <span>Product identity</span>
+          <input
+            placeholder="MCH-P-000125"
+            value={permanentId}
+            onChange={(e) => setPermanentId(e.target.value)}
+            required
+          />
+        </div>
+        <button type="submit" className="mt-primary-btn">
+          Look up forecasts
         </button>
       </form>
 
-      {error && <div className="text-status-fail text-sm mb-4">{error}</div>}
+      {error && <div className="mt-alert mt-alert--error">{error}</div>}
 
       {forecasts && forecasts.length === 0 && (
-        <p className="text-text-muted text-sm">No forecasts recorded for this product yet.</p>
+        <div className="mt-empty-state mt-table-panel">
+          <div className="mt-empty-state__icon">⌁</div>
+          <h3>No forecasts recorded</h3>
+          <p>No forecast records exist for this product yet.</p>
+        </div>
       )}
 
       {forecasts && forecasts.length > 0 && (
-        <table className="w-full text-sm max-w-2xl">
-          <thead>
-            <tr className="text-left text-text-muted border-b border-line">
-              <th className="py-2 font-normal">Type</th>
-              <th className="py-2 font-normal">Horizon</th>
-              <th className="py-2 font-normal text-right">Predicted</th>
-              <th className="py-2 font-normal text-right">Stockout Risk</th>
-              <th className="py-2 font-normal text-right">Recommended Restock</th>
-            </tr>
-          </thead>
-          <tbody>
-            {forecasts.map((f, idx) => (
-              <tr key={idx} className="border-b border-line">
-                <td className="py-2 font-mono">{f.forecast_type}</td>
-                <td className="py-2 text-text-muted">{f.horizon_days}d</td>
-                <td className="py-2 text-right font-mono">{f.predicted_value}</td>
-                <td className="py-2 text-right font-mono text-status-review">
-                  {(f.stockout_risk * 100).toFixed(0)}%
-                </td>
-                <td className="py-2 text-right font-mono">{f.recommended_restock}</td>
+        <section className="mt-table-panel">
+          <div className="mt-panel-heading">
+            <div>
+              <h3>Forecast records</h3>
+              <span>Prediction horizon, risk and suggested restock.</span>
+            </div>
+            <span className="mt-count-pill">
+              {forecasts.length} records
+            </span>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Horizon</th>
+                <th className="text-right">Predicted</th>
+                <th className="text-right">Stockout risk</th>
+                <th className="text-right">Recommended restock</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {forecasts.map((f, idx) => {
+                const risk = Number(f.stockout_risk || 0) * 100;
+
+                return (
+                  <tr key={idx}>
+                    <td className="mt-mono">{f.forecast_type}</td>
+                    <td>{f.horizon_days}d</td>
+                    <td className="text-right mt-mono">
+                      {f.predicted_value}
+                    </td>
+                    <td className="text-right">
+                      <span
+                        className={`mt-status-pill ${
+                          risk >= 70
+                            ? "mt-status-pill--danger"
+                            : risk >= 40
+                            ? "mt-status-pill--warning"
+                            : "mt-status-pill--success"
+                        }`}
+                      >
+                        {risk.toFixed(0)}%
+                      </span>
+                    </td>
+                    <td className="text-right mt-mono">
+                      {f.recommended_restock}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </section>
       )}
     </Layout>
   );

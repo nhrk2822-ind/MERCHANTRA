@@ -1,0 +1,779 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap");
+
+/* =========================================================
+   MAIN LOGIN PAGE
+   ========================================================= */
+
+.login {
+  --ivory: #f8f6f2;
+  --ivory-light: #fdfbf8;
+
+  --navy: #193853;
+  --navy-soft: #526d84;
+
+  --text: #263b4d;
+  --muted: #8997a2;
+
+  --line: rgba(34, 58, 78, 0.16);
+
+  position: relative;
+
+  min-height: 100vh;
+  min-height: 100dvh;
+
+  width: 100%;
+
+  overflow: hidden;
+  isolation: isolate;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 40px 24px;
+
+  color: var(--text);
+
+  font-family:
+    "Manrope",
+    Inter,
+    Arial,
+    sans-serif;
+
+  background:
+    radial-gradient(
+      circle at 50% 45%,
+      rgba(255, 255, 255, 0.99) 0%,
+      rgba(255, 255, 255, 0.91) 25%,
+      rgba(255, 255, 255, 0.18) 60%,
+      transparent 76%
+    ),
+    radial-gradient(
+      circle at 7% 8%,
+      rgba(205, 215, 222, 0.42) 0%,
+      transparent 34%
+    ),
+    radial-gradient(
+      circle at 95% 91%,
+      rgba(218, 210, 202, 0.34) 0%,
+      transparent 34%
+    ),
+    linear-gradient(
+      135deg,
+      #eeebe6 0%,
+      #f8f6f2 48%,
+      #e9e7e3 100%
+    );
+}
+
+/* =========================================================
+   SUBTLE TEXTURE
+   ========================================================= */
+
+.login::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  z-index: 0;
+
+  pointer-events: none;
+
+  opacity: 0.12;
+
+  background-image:
+    radial-gradient(
+      rgba(31, 53, 70, 0.28) 0.45px,
+      transparent 0.45px
+    );
+
+  background-size: 18px 18px;
+}
+
+/* =========================================================
+   RANDOM FLOATING APP BACKGROUND
+   ========================================================= */
+
+.mt-float {
+  position: absolute;
+  inset: 0;
+
+  z-index: 1;
+
+  overflow: hidden;
+
+  pointer-events: none;
+}
+
+/* soft background atmosphere */
+.mt-float__atmosphere {
+  position: absolute;
+  inset: 0;
+
+  z-index: 0;
+
+  background:
+    radial-gradient(
+      ellipse at 10% 45%,
+      rgba(255, 255, 255, 0.18),
+      transparent 42%
+    ),
+    radial-gradient(
+      ellipse at 90% 48%,
+      rgba(255, 255, 255, 0.18),
+      transparent 42%
+    );
+}
+
+/* ---------------------------------------------------------
+   EVERY ICON IS AN INDEPENDENT FLOATING OBJECT
+   --------------------------------------------------------- */
+
+.mt-float__item {
+  position: absolute;
+
+  left: var(--icon-x);
+  bottom: -120px;
+
+  width: var(--icon-size);
+  height: var(--icon-size);
+
+  z-index: 3;
+
+  animation:
+    mt-random-rise
+    var(--icon-duration)
+    linear
+    var(--icon-delay)
+    infinite;
+
+  will-change: transform;
+}
+
+/* =========================================================
+   ICON GLASS CONTAINER
+   ========================================================= */
+
+.mt-float__icon {
+  width: 100%;
+  height: 100%;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 23px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.87),
+      rgba(235, 233, 229, 0.36)
+    );
+
+  border:
+    1px solid
+    rgba(42, 57, 68, 0.12);
+
+  box-shadow:
+    0 18px 40px
+    rgba(37, 49, 58, 0.10),
+
+    inset 0 1px 0
+    rgba(255, 255, 255, 0.96);
+
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+
+  animation:
+    mt-random-wobble
+    4.8s
+    ease-in-out
+    infinite;
+}
+
+/* =========================================================
+   ACTUAL BRAND-COLOUR SVG ICONS
+   ========================================================= */
+
+.mt-float__icon svg {
+  width: 62%;
+  height: 62%;
+
+  display: block;
+
+  overflow: visible;
+
+  filter:
+    drop-shadow(
+      0 4px 8px
+      rgba(30, 43, 54, 0.10)
+    );
+}
+
+/* =========================================================
+   RANDOM BOTTOM -> TOP MOTION
+   ========================================================= */
+
+@keyframes mt-random-rise {
+  0% {
+    transform:
+      translate3d(0, 0, 0)
+      rotate(0deg);
+  }
+
+  18% {
+    transform:
+      translate3d(
+        calc(var(--icon-drift) * -0.35),
+        -24vh,
+        0
+      )
+      rotate(
+        calc(var(--icon-rotate) * 0.35)
+      );
+  }
+
+  38% {
+    transform:
+      translate3d(
+        calc(var(--icon-drift) * 0.65),
+        -49vh,
+        0
+      )
+      rotate(
+        var(--icon-rotate)
+      );
+  }
+
+  58% {
+    transform:
+      translate3d(
+        calc(var(--icon-drift) * -0.55),
+        -75vh,
+        0
+      )
+      rotate(
+        calc(var(--icon-rotate) * -0.70)
+      );
+  }
+
+  78% {
+    transform:
+      translate3d(
+        var(--icon-drift),
+        -101vh,
+        0
+      )
+      rotate(
+        calc(var(--icon-rotate) * 0.50)
+      );
+  }
+
+  100% {
+    transform:
+      translate3d(
+        calc(var(--icon-drift) * -0.25),
+        -135vh,
+        0
+      )
+      rotate(
+        var(--icon-rotate)
+      );
+  }
+}
+
+/* small natural floating movement */
+@keyframes mt-random-wobble {
+  0%,
+  100% {
+    margin-left: -4px;
+    margin-top: -3px;
+  }
+
+  50% {
+    margin-left: 5px;
+    margin-top: 7px;
+  }
+}
+
+/* =========================================================
+   CENTER GLOW
+   Kept subtle so icons do not disappear
+   ========================================================= */
+
+.mt-float__center-glow {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  width: min(700px, 74vw);
+  height: min(650px, 72vh);
+
+  transform:
+    translate(-50%, -50%);
+
+  border-radius: 50%;
+
+  z-index: 8;
+
+  pointer-events: none;
+
+  background:
+    radial-gradient(
+      ellipse,
+      rgba(255, 254, 252, 0.20) 0%,
+      rgba(255, 254, 252, 0.07) 42%,
+      transparent 74%
+    );
+
+  filter: blur(10px);
+}
+
+/* =========================================================
+   LOGIN CONTENT
+   ========================================================= */
+
+.login__stage {
+  position: relative;
+
+  z-index: 20;
+
+  width: min(100%, 450px);
+
+  padding: 18px 12px;
+
+  animation:
+    mt-login-enter
+    0.8s
+    cubic-bezier(0.22, 1, 0.36, 1)
+    both;
+}
+
+@keyframes mt-login-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+/* =========================================================
+   SOFT HALO BEHIND LOGIN
+   ========================================================= */
+
+.login__halo {
+  position: absolute;
+
+  width: 520px;
+  height: 520px;
+
+  left: 50%;
+  top: 50%;
+
+  transform:
+    translate(-50%, -50%);
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(255, 255, 255, 0.70) 0%,
+      rgba(255, 255, 255, 0.38) 40%,
+      transparent 73%
+    );
+
+  filter: blur(8px);
+
+  z-index: -1;
+
+  pointer-events: none;
+}
+
+/* =========================================================
+   MERCHANTRA LOGO
+   ========================================================= */
+
+.merchantra-brand {
+  width: 100%;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 28px;
+}
+
+.merchantra-brand__image {
+  display: block;
+
+  width: min(365px, 90vw);
+
+  height: auto;
+
+  object-fit: contain;
+
+  background: transparent;
+
+  border: 0;
+
+  box-shadow: none;
+}
+
+/* =========================================================
+   REMOVE CARD LOOK
+   ========================================================= */
+
+.login__stage form,
+.login__form,
+.login__panel,
+.login__card {
+  background: transparent !important;
+
+  border: 0 !important;
+
+  box-shadow: none !important;
+
+  backdrop-filter: none !important;
+}
+
+/* =========================================================
+   HEADINGS
+   ========================================================= */
+
+.login h1,
+.login__title {
+  margin: 0 0 9px;
+
+  color: var(--navy);
+
+  font-family:
+    "Manrope",
+    Inter,
+    Arial,
+    sans-serif;
+
+  font-size:
+    clamp(30px, 4vw, 34px);
+
+  font-weight: 800;
+
+  letter-spacing: -1.5px;
+
+  line-height: 1.15;
+}
+
+.login h2,
+.login__heading {
+  color: var(--navy);
+
+  font-family:
+    "Manrope",
+    sans-serif;
+
+  font-weight: 800;
+
+  letter-spacing: -0.8px;
+}
+
+.login p,
+.login__subtitle {
+  margin: 0;
+
+  color: var(--muted);
+
+  font-size: 12px;
+
+  line-height: 1.75;
+}
+
+/* =========================================================
+   FORM LABELS
+   ========================================================= */
+
+.login label {
+  display: block;
+
+  margin:
+    20px 0
+    8px;
+
+  color: #617488;
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  letter-spacing: 1.15px;
+
+  text-transform: uppercase;
+}
+
+/* =========================================================
+   INPUTS
+   ========================================================= */
+
+.login input {
+  width: 100%;
+
+  height: 54px;
+
+  padding:
+    0 17px;
+
+  border:
+    1px solid
+    rgba(31, 55, 74, 0.17);
+
+  border-radius: 14px;
+
+  outline: none;
+
+  color: var(--text);
+
+  background:
+    rgba(255, 255, 255, 0.60);
+
+  font-family:
+    "Manrope",
+    sans-serif;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  box-shadow:
+    inset 0 1px 0
+    rgba(255, 255, 255, 0.92);
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.login input::placeholder {
+  color: #9ca9b3;
+
+  font-weight: 500;
+}
+
+.login input:hover {
+  border-color:
+    rgba(31, 55, 74, 0.28);
+}
+
+.login input:focus {
+  border-color:
+    rgba(25, 56, 83, 0.46);
+
+  background:
+    rgba(255, 255, 255, 0.90);
+
+  box-shadow:
+    0 0 0 4px
+    rgba(48, 80, 105, 0.07),
+
+    0 12px 30px
+    rgba(33, 51, 65, 0.06);
+}
+
+/* =========================================================
+   SIGN IN BUTTON
+   ========================================================= */
+
+.login button[type="submit"] {
+  width: 100%;
+
+  height: 54px;
+
+  margin-top: 23px;
+
+  border:
+    1px solid
+    #102b43;
+
+  border-radius: 14px;
+
+  color: #ffffff;
+
+  background:
+    linear-gradient(
+      135deg,
+      #18364f 0%,
+      #244d6c 52%,
+      #17334c 100%
+    );
+
+  font-family:
+    "Manrope",
+    sans-serif;
+
+  font-size: 11px;
+
+  font-weight: 800;
+
+  letter-spacing: 0.95px;
+
+  text-transform: uppercase;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 16px 31px
+    rgba(24, 56, 82, 0.20);
+
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    filter 0.22s ease;
+}
+
+.login button[type="submit"]:hover {
+  transform:
+    translateY(-2px);
+
+  box-shadow:
+    0 20px 38px
+    rgba(24, 56, 82, 0.26);
+
+  filter:
+    brightness(1.07);
+}
+
+.login button[type="submit"]:active {
+  transform:
+    translateY(0);
+}
+
+/* =========================================================
+   LINKS
+   ========================================================= */
+
+.login a {
+  color:
+    var(--navy-soft);
+
+  font-weight: 700;
+
+  text-decoration: none;
+
+  transition:
+    color 0.2s ease;
+}
+
+.login a:hover {
+  color:
+    var(--navy);
+}
+
+/* =========================================================
+   ERROR
+   ========================================================= */
+
+.login__error {
+  color:
+    #9a4e4e;
+
+  font-size: 12px;
+
+  font-weight: 600;
+}
+
+/* =========================================================
+   FOOTER / SMALL TEXT
+   ========================================================= */
+
+.login__links,
+.login__footer {
+  color:
+    #8d9aa4;
+
+  font-size: 12px;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+  .mt-float__item:nth-child(4n) {
+    opacity: 0.75;
+  }
+
+  .mt-float__item:nth-child(7n) {
+    opacity: 0.70;
+  }
+}
+
+@media (max-width: 700px) {
+  .mt-float__item {
+    transform-origin: center;
+  }
+
+  .mt-float__icon {
+    border-radius: 20px;
+  }
+
+  .mt-float__icon svg {
+    width: 58%;
+    height: 58%;
+  }
+}
+
+@media (max-width: 560px) {
+  .login {
+    padding:
+      28px 18px;
+  }
+
+  .login__stage {
+    padding:
+      8px 0;
+  }
+
+  .merchantra-brand {
+    margin-bottom: 23px;
+  }
+
+  .merchantra-brand__image {
+    width:
+      min(320px, 92vw);
+  }
+
+  .mt-float__item {
+    opacity: 0.64;
+  }
+
+  .mt-float__icon {
+    border-radius: 18px;
+  }
+
+  .mt-float__icon svg {
+    width: 58%;
+    height: 58%;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .mt-float__item,
+  .mt-float__icon,
+  .login__stage {
+    animation: none !important;
+  }
+}
